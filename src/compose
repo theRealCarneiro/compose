@@ -5,6 +5,36 @@ COMPOSE_HOME=${COMPOSE_HOME:-/docker}
 
 COMMAND=$1
 
+print_help() {
+	printf '
+Usage: compose COMMAND [ARGS] PROJECT_NAME
+
+	Includes all standard docker-compose commands, plus additional ones.
+	Run docker-compose --help for more information about the standard commands.
+
+
+Additional Commands:
+	status [no args]              -- Displays information about the projects, 
+	                                 including their names and statuses (running,
+	                                 down, exited).
+
+	full-restart PROJECT_NAME     -- Performs a full restart by running compose
+	                                 down followed by compose up -d
+
+	ls [no args]                  -- Lists Docker Compose projects
+
+
+Example Usage:
+	compose logs traefik          -- Display logs for traefik compose project
+	compose logs --follow traefik -- Performs a full restart by running compose down
+	                                 followed by compose up -d
+
+	compose full-restart traefik  -- Performs a full restart on traefik compose project
+
+	compose status                -- Displays information about the projects
+	compose ls                    -- Lists Docker Compose projects'
+}
+
 while [ "$#" -gt 0 ]; do
     case "$1" in
         -*)
@@ -19,6 +49,10 @@ done
 
 
 case $COMMAND in
+	"--help") 
+		print_help 
+		exit 0
+	;;
 	"ls")
 		ls "${COMPOSE_HOME}"
 		exit 0
