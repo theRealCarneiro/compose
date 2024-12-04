@@ -3,26 +3,38 @@
 _compose(){
   local -a args
   if (( CURRENT < 3 )); then
-    args+=(
+		args+=(
       1:'Command:(logs restart full-restart up down ls commit)'
       '--help[Display help message]'
     )
     _arguments $args[@]
     return
-  fi
+	fi 
 
-  (( CURRENT > 3 )) || case $words[2] in
-    logs|restart|full-restart|up|down)
-      _list_projects
-     return
-      ;;
-    "ls")
-     return
-      ;;
-    "--help")
-     return
-      ;;
-  esac
+  if (( CURRENT >= 3 )); then
+		case $words[2] in
+			logs|restart|full-restart|up|down)
+
+				(( CURRENT != 3 )) && case $words[-2] in
+
+					# keep sugesting projects when passing --args
+					-*) ;;
+
+					# if detects word without --, stops
+					*) return;;
+				esac
+
+				_list_projects
+				return
+			;;
+			"ls")
+				 return
+			;;
+			"--help")
+				 return
+			;;
+	  esac
+	fi
 }
 
 _list_projects(){

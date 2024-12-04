@@ -1,0 +1,48 @@
+# Bash completion for `compose`
+
+_compose() {
+    local cur prev words cword
+    _init_completion || return
+
+    # Commands for the first argument
+    local commands="logs restart full-restart up down ls commit"
+    local options="--help"
+
+    if (( COMP_CWORD < 2 )); then
+        # Suggest commands and options as the first argument
+        COMPREPLY=( $(compgen -W "$commands $options" -- "$cur") )
+        return
+    fi
+
+    # Handling subcommands
+    case "${words[1]}" in
+        logs|restart|full-restart|up|down)
+            if (( COMP_CWORD > 2 )); then
+                case "${words[COMP_CWORD-1]}" in
+                    -*)
+                        # Continue suggesting projects even if arguments start with `-`
+                        ;;
+                    *)
+                        # Stop suggesting if we detect a word without `--`
+                        return
+                        ;;
+                esac
+            fi
+            _list_projects
+            return
+            ;;
+        ls|--help)
+            # No additional completions needed for these commands
+            return
+            ;;
+    esac
+}
+
+_list_projects() {
+    # Replace this command with your logic to list projects
+    local projects="$(compose ls)"
+    COMPREPLY=( $(compgen -W "$projects" -- "$cur") )
+}
+
+# Register the completion function for `compose`
+complete -F _compose compose
