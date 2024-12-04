@@ -1,0 +1,4 @@
+#!/bin/sh
+
+COMPOSE_HOME=${COMPOSE_HOME:-/docker}
+echo $COMPOSE_HOME

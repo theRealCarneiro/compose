@@ -1,0 +1,32 @@
+#compdef compose
+
+_compose(){
+  local -a args
+  if (( CURRENT < 3 )); then
+    args+=(
+      1:'Command:(logs restart full-restart up down ls commit)'
+      '--help[Display help message]'
+    )
+    _arguments $args[@]
+    return
+  fi
+
+  (( CURRENT > 3 )) || case $words[2] in
+    logs|restart|full-restart|up|down)
+      _list_projects
+     return
+      ;;
+    "ls")
+     return
+      ;;
+    "--help")
+     return
+      ;;
+  esac
+}
+
+_list_projects(){
+  _alternative "($(compose ls))"
+}
+
+_compose
