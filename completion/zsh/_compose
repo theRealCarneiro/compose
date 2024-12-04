@@ -4,7 +4,7 @@ _compose(){
   local -a args
   if (( CURRENT < 3 )); then
 		args+=(
-      1:'Command:(logs restart full-restart up down ls commit)'
+      1:'Command:(logs status ps restart full-restart up down ls commit)'
       '--help[Display help message]'
     )
     _arguments $args[@]
@@ -13,7 +13,7 @@ _compose(){
 
   if (( CURRENT >= 3 )); then
 		case $words[2] in
-			logs|restart|full-restart|up|down)
+			logs|restart|ps|full-restart|up|down)
 
 				(( CURRENT != 3 )) && case $words[-2] in
 

@@ -5,7 +5,7 @@ _compose() {
     _init_completion || return
 
     # Commands for the first argument
-    local commands="logs restart full-restart up down ls commit"
+    local commands="logs status restart full-restart up down ls commit"
     local options="--help"
 
     if (( COMP_CWORD < 2 )); then

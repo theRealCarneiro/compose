@@ -1,5 +1,6 @@
 #!/bin/sh
 
+COMPOSE_CMD='docker compose --project-directory'
 COMPOSE_HOME=${COMPOSE_HOME:-/docker}
 
 COMMAND=$1
@@ -10,11 +11,12 @@ while [ "$#" -gt 0 ]; do
             ARGS="$ARGS $1"
             ;;
         *)
-            PROJECT_NAME="$1"
+            [ "$COMMAND" != "$1" ] && PROJECT_NAME="$1"
             ;;
     esac
     shift
 done
+
 
 case $COMMAND in
 	"ls")
@@ -22,13 +24,33 @@ case $COMMAND in
 		exit 0
 	;;
 
+	"status")
+		printf "%-20s \t%s\n" "NAME" "STATUS"
+		command_status=$(docker compose ls -a)
+		for i in $(ls "${COMPOSE_HOME}"); do
+			PROJECT_DIR=${COMPOSE_HOME}/${i}
+			status=down
+			possible_status=$(echo "$command_status" | awk "/$i /"'{print $2}' )
+
+			[ ! -z "$possible_status" ] && status=$possible_status
+
+			printf "%-20s \t%s\n" $i $status
+		done
+
+		exit 0
+	;;
+
 	"full-restart")
-		docker compose --project-directory "${COMPOSE_HOME}/${PROJECT_NAME}" down
-		docker compose --project-directory "${COMPOSE_HOME}/${PROJECT_NAME}" up -d
+		$COMPOSE_CMD "${COMPOSE_HOME}/${PROJECT_NAME}" down
+		$COMPOSE_CMD "${COMPOSE_HOME}/${PROJECT_NAME}" up -d
 		exit 0
 	;;
 
 	"*") ;;
 esac
 
-echo docker compose --project-directory "${COMPOSE_HOME}/${PROJECT_NAME}" $COMMAND $ARGS
+if [ -z $PROJECT_NAME ]; then
+	echo "ERROR: Empty project name" 1>&2;
+	exit 1
+fi
+docker compose --project-directory "${COMPOSE_HOME}/${PROJECT_NAME}" $COMMAND $ARGS
